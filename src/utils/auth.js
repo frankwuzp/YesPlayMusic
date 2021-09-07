@@ -27,6 +27,14 @@ export function isAccountLoggedIn() {
   );
 }
 
+export function getStorage(cname) {
+  return localStorage.getItem(cname);
+}
+
+export function setStorage(cname, cvalue) {
+  localStorage.setItem(cname, cvalue);
+}
+
 // 用户名搜索（用户数据为只读）
 export function isUsernameLoggedIn() {
   return store.state.data.loginMode === 'username';
@@ -56,6 +64,11 @@ export function setMusicU(key, value) {
 export function setCookies(string) {
   const cookies = string.split(';;');
   cookies.map(cookie => {
-    document.cookie = cookie;
+    const storeArr = cookie.split('; ');
+    storeArr.map(storeItem => {
+      const item = storeItem.split('=');
+      setStorage(item[0], item[1]);
+    });
+    document.cookie += cookie;
   });
 }
