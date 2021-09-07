@@ -16,13 +16,13 @@ export function doLogout() {
 
 // MUSIC_U 只有在账户登录的情况下才有
 export function isLoggedIn() {
-  return Cookies.get('MUSIC_U') !== undefined ? true : false;
+  return getStorage('MUSIC_U') !== undefined ? true : false;
 }
 
 // 账号登录
 export function isAccountLoggedIn() {
   return (
-    Cookies.get('MUSIC_U') !== undefined &&
+    getStorage('MUSIC_U') !== undefined &&
     store.state.data.loginMode === 'account'
   );
 }
