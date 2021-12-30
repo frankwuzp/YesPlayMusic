@@ -1,14 +1,13 @@
-// 分享歌曲到动态
+// 领取云豆
 
 module.exports = (query, request) => {
   const data = {
-    type: query.type || 'song', // song,playlist,mv,djprogram，djradio
-    msg: query.msg || '',
-    id: query.id || '',
+    userMissionId: query.id,
+    period: query.period,
   }
   return request(
     'POST',
-    `https://music.163.com/weapi/share/friends/resource`,
+    `https://music.163.com/weapi/nmusician/workbench/mission/reward/obtain/new`,
     data,
     {
       crypto: 'weapi',

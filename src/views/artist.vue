@@ -42,7 +42,7 @@
         </div>
       </div>
     </div>
-    <div class="latest-release">
+    <div v-if="latestRelease !== undefined" class="latest-release">
       <div class="section-title">{{ $t('artist.latestRelease') }}</div>
       <div class="release">
         <div class="container">
@@ -168,6 +168,9 @@
     <ContextMenu ref="artistMenu">
       <div class="item" @click="copyUrl(artist.id)">{{
         $t('contextMenu.copyUrl')
+      }}</div>
+      <div class="item" @click="openInBrowser(artist.id)">{{
+        $t('contextMenu.openInBrowser')
       }}</div>
     </ContextMenu>
   </div>
@@ -339,13 +342,17 @@ export default {
     },
     copyUrl(id) {
       let showToast = this.showToast;
-      this.$copyText('https://music.163.com/#/artist?id=' + id)
+      this.$copyText(`https://music.163.com/#/artist?id=${id}`)
         .then(function () {
           showToast(locale.t('toast.copied'));
         })
         .catch(error => {
           showToast(`${locale.t('toast.copyFailed')}${error}`);
         });
+    },
+    openInBrowser(id) {
+      const url = `https://music.163.com/#/artist?id=${id}`;
+      window.open(url);
     },
   },
 };

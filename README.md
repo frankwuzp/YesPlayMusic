@@ -26,7 +26,9 @@
 - 📻 支持私人 FM / 每日推荐歌曲
 - 🚫🤝 无任何社交功能
 - 🌎️ 海外用户可直接播放（需要登录网易云账号）
-- 🔐 支持 [UnblockNeteaseMusic](https://github.com/nondanee/UnblockNeteaseMusic)（[使用 revincx 修复的 npm 包](https://github.com/revincx/UnblockNeteaseMusic)），自动使用 QQ/酷狗/酷我音源替换变灰歌曲链接 （网页版不支持）
+- 🔐 支持 [UnblockNeteaseMusic](https://github.com/UnblockNeteaseMusic/server#音源清单)，自动使用[各类音源](https://github.com/UnblockNeteaseMusic/server#音源清单)替换变灰歌曲链接 （网页版不支持）
+  - 「各类音源」指默认启用的音源。
+  - YouTube 音源需自行安装 `yt-dlp`。
 - ✔️ 每日自动签到（手机端和电脑端同时签到）
 - 🌚 Light/Dark Mode 自动切换
 - 👆 支持 Touch Bar
@@ -41,7 +43,7 @@
 Electron 版本由 [@hawtim](https://github.com/hawtim) 和 [@qier222](https://github.com/qier222) 适配并维护，支持 macOS、Windows、Linux。
 
 访问本项目的 [Releases](https://github.com/qier222/YesPlayMusic/releases)
-页面下载安装包，或者访问 [镜像下载站 (大陆访问更快)](https://dl.qier222.com/YesPlayMusic/) 下载。
+页面下载安装包。
 
 macOS 用户也可以通过 `brew install --cask yesplaymusic` 来安装。
 
@@ -54,13 +56,26 @@ macOS 用户也可以通过 `brew install --cask yesplaymusic` 来安装。
 
 2. 点击本仓库右上角的 Fork，复制本仓库到你的 GitHub 账号。
 
-3. 打开 [Vercel.com](https://vercel.com)，使用 GitHub 登录。
+3. 点击仓库的 Add File，选择 Create new file，输入 `vercel.json`，将下面的内容复制粘贴到文件中，并将 `https://your-netease-api.example.com` 替换为你刚刚部署的网易云 API 地址：
 
-4. 点击 Import Git Repository 并选择你刚刚复制的仓库并点击 Import。
+```json
+{
+  "rewrites": [
+    {
+      "source": "/api/:match*",
+      "destination": "https://your-netease-api.example.com/:match*"
+    }
+  ]
+}
+```
 
-5. 点击 PERSONAL ACCOUNT 旁边的 Select。
+4. 打开 [Vercel.com](https://vercel.com)，使用 GitHub 登录。
 
-6. 点击 Environment Variables，填写 Name 为 `VUE_APP_NETEASE_API_URL`，Value 为你刚刚部署的网易云 API 地址，点击 Add。最后点击底部的 Deploy 就可以部署到
+5. 点击 Import Git Repository 并选择你刚刚复制的仓库并点击 Import。
+
+6. 点击 PERSONAL ACCOUNT 旁边的 Select。
+
+7. 点击 Environment Variables，填写 Name 为 `VUE_APP_NETEASE_API_URL`，Value 为 `/api`，点击 Add。最后点击底部的 Deploy 就可以部署到
    Vercel 了。
 
 ## ⚙️ 部署到自己的服务器
@@ -127,7 +142,7 @@ yarn run build
 
 ```shell
 # 安装依赖
-yarn
+yarn install
 
 # 创建本地环境变量
 cp .env.example .env
