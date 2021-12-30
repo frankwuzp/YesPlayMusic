@@ -1,5 +1,9 @@
 import axios from 'axios';
+<<<<<<< HEAD
 import { getStorage } from '@/utils/auth';
+=======
+import { getCookie } from '@/utils/auth';
+>>>>>>> d15381020552cbd0faa1c6447367687ea0b99657
 
 let baseURL = '';
 // Web 和 Electron 跑在不同端口避免同时启动时冲突
@@ -22,7 +26,15 @@ const service = axios.create({
 service.interceptors.request.use(function (config) {
   if (!config.params) config.params = {};
   if (baseURL[0] !== '/' && !process.env.IS_ELECTRON) {
+<<<<<<< HEAD
     config.params.cookie = `MUSIC_U=${getStorage('MUSIC_U')};`;
+=======
+    config.params.cookie = `MUSIC_U=${getCookie('MUSIC_U')};`;
+  }
+
+  if (!process.env.IS_ELECTRON && !config.url.includes('/login')) {
+    config.params.realIP = '211.161.244.70';
+>>>>>>> d15381020552cbd0faa1c6447367687ea0b99657
   }
 
   const proxy = JSON.parse(localStorage.getItem('settings')).proxyConfig;

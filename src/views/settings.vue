@@ -35,7 +35,7 @@
             <option value="en">🇬🇧 English</option>
             <option value="tr">🇹🇷 Türkçe</option>
             <option value="zh-CN">🇨🇳 简体中文</option>
-            <option value="zh-TW">ᴛᴡ 繁體中文</option>
+            <option value="zh-TW">繁體中文</option>
           </select>
         </div>
       </div>
@@ -222,6 +222,58 @@
         </div>
       </div>
 
+      <section v-if="isElectron" class="unm-configuration">
+        <h3>UnblockNeteaseMusic 设定</h3>
+        <div class="item">
+          <div class="left">
+            <div class="title"
+              >启用
+              <a
+                href="https://github.com/UnblockNeteaseMusic/server"
+                target="blank"
+                >UnblockNeteaseMusic</a
+              ></div
+            >
+          </div>
+          <div class="right">
+            <div class="toggle">
+              <input
+                id="enable-unblock-netease-music"
+                v-model="enableUnblockNeteaseMusic"
+                type="checkbox"
+                name="enable-unblock-netease-music"
+              />
+              <label for="enable-unblock-netease-music"></label>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="left">
+            <div class="title"> 备选音源 </div>
+            <div class="description">
+              音源的具体代号
+              <a
+                href="https://github.com/UnblockNeteaseMusic/server#音源清单"
+                target="_blank"
+              >
+                可以点此到 UNM 的说明页面查询 </a
+              ><br />
+              多个音源请用 <code>,</code> 逗号分隔。<br />
+              留空则使用 UNM 内置的默认值。
+            </div>
+          </div>
+          <div class="right">
+            <input
+              id="unm-source"
+              v-model="unmSource"
+              class="text-input"
+              placeholder="例 bilibili, kuwo"
+            />
+            <label for="unm-source"></label>
+          </div>
+        </div>
+      </section>
+
       <h3>第三方</h3>
       <div class="item">
         <div class="left">
@@ -238,29 +290,6 @@
             >断开连接
           </button>
           <button v-else @click="lastfmConnect()"> 授权连接 </button>
-        </div>
-      </div>
-      <div v-if="isElectron" class="item">
-        <div class="left">
-          <div class="title"
-            >启用
-            <a
-              href="https://github.com/nondanee/UnblockNeteaseMusic"
-              target="blank"
-              >UnblockNeteaseMusic</a
-            ></div
-          >
-        </div>
-        <div class="right">
-          <div class="toggle">
-            <input
-              id="enable-unblock-netease-music"
-              v-model="enableUnblockNeteaseMusic"
-              type="checkbox"
-              name="enable-unblock-netease-music"
-            />
-            <label for="enable-unblock-netease-music"></label>
-          </div>
         </div>
       </div>
       <div v-if="isElectron" class="item">
@@ -285,18 +314,20 @@
       <h3>其他</h3>
       <div v-if="isElectron && !isMac" class="item">
         <div class="left">
-          <div class="title">{{ $t('settings.minimizeToTray') }}</div>
+          <div class="title"> {{ $t('settings.closeAppOption.text') }} </div>
         </div>
         <div class="right">
-          <div class="toggle">
-            <input
-              id="minimize-to-tray"
-              v-model="minimizeToTray"
-              type="checkbox"
-              name="minimize-to-tray"
-            />
-            <label for="minimize-to-tray"></label>
-          </div>
+          <select v-model="closeAppOption">
+            <option value="ask">
+              {{ $t('settings.closeAppOption.ask') }}
+            </option>
+            <option value="exit">
+              {{ $t('settings.closeAppOption.exit') }}
+            </option>
+            <option value="minimizeToTray">
+              {{ $t('settings.closeAppOption.minimizeToTray') }}
+            </option>
+          </select>
         </div>
       </div>
 
@@ -335,6 +366,24 @@
           </div>
         </div>
       </div>
+
+      <div class="item">
+        <div class="left">
+          <div class="title">{{ $t('settings.subTitleDefault') }}</div>
+        </div>
+        <div class="right">
+          <div class="toggle">
+            <input
+              id="sub-title-default"
+              v-model="subTitleDefault"
+              type="checkbox"
+              name="sub-title-default"
+            />
+            <label for="sub-title-default"></label>
+          </div>
+        </div>
+      </div>
+
       <div class="item">
         <div class="left">
           <div class="title" style="transform: scaleX(-1)">🐈️ 🏳️‍🌈</div>
@@ -723,13 +772,13 @@ export default {
         });
       },
     },
-    minimizeToTray: {
+    closeAppOption: {
       get() {
-        return this.settings.minimizeToTray;
+        return this.settings.closeAppOption;
       },
       set(value) {
         this.$store.commit('updateSettings', {
-          key: 'minimizeToTray',
+          key: 'closeAppOption',
           value,
         });
       },
@@ -741,6 +790,17 @@ export default {
       set(value) {
         this.$store.commit('updateSettings', {
           key: 'enableDiscordRichPresence',
+          value,
+        });
+      },
+    },
+    subTitleDefault: {
+      get() {
+        return this.settings.subTitleDefault;
+      },
+      set(value) {
+        this.$store.commit('updateSettings', {
+          key: 'subTitleDefault',
           value,
         });
       },
@@ -818,6 +878,21 @@ export default {
         this.$store.commit('updateSettings', {
           key: 'proxyConfig',
           value: config,
+        });
+      },
+    },
+    unmSource: {
+      /**
+       * @returns {string}
+       */
+      get() {
+        return this.settings.unmSource || '';
+      },
+      /** @param {string?} value */
+      set(value) {
+        this.$store.commit('updateSettings', {
+          key: 'unmSource',
+          value: value.length ? value : null,
         });
       },
     },
@@ -973,6 +1048,7 @@ export default {
       this.recordedShortcut = [];
     },
     exitRecordShortcut() {
+      if (this.shortcutInput.recording === false) return;
       this.shortcutInput = { id: '', type: '', recording: false };
       this.recordedShortcut = [];
       ipcRenderer.send('switchGlobalShortcutStatusTemporary', 'enable');
@@ -1095,6 +1171,12 @@ h3 {
     font-size: 16px;
     font-weight: 500;
     opacity: 0.78;
+  }
+
+  .description {
+    font-size: 14px;
+    margin-top: 0.5em;
+    opacity: 0.7;
   }
 }
 

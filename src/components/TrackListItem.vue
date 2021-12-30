@@ -43,8 +43,8 @@
           <span v-if="isAlbum && track.mark === 1318912" class="explicit-symbol"
             ><ExplicitSymbol
           /></span>
-          <span v-if="isTranslate" :title="translate" class="translate">
-            ({{ translate }})
+          <span v-if="isSubTitle" :title="subTitle" class="sub-title">
+            ({{ subTitle }})
           </span>
         </div>
         <div v-if="!isAlbum" class="artist">
@@ -60,7 +60,9 @@
     </div>
 
     <div v-if="showAlbumName" class="album">
-      <router-link :to="`/album/${album.id}`">{{ album.name }}</router-link>
+      <router-link v-if="album && album.id" :to="`/album/${album.id}`">{{
+        album.name
+      }}</router-link>
       <div></div>
     </div>
 
@@ -85,6 +87,7 @@
 import ArtistsInLine from '@/components/ArtistsInLine.vue';
 import ExplicitSymbol from '@/components/ExplicitSymbol.vue';
 import { mapState } from 'vuex';
+import { isNil } from 'lodash';
 
 export default {
   name: 'TrackListItem',
@@ -117,18 +120,29 @@ export default {
       return image + '?param=224y224';
     },
     artists() {
-      if (this.track.ar !== undefined) return this.track.ar;
-      if (this.track.artists !== undefined) return this.track.artists;
+      const { ar, artists } = this.track;
+      if (!isNil(ar)) return ar;
+      if (!isNil(artists)) return artists;
       return [];
     },
     album() {
       return this.track.album || this.track.al || this.track?.simpleSong?.al;
     },
-    translate() {
-      let t;
-      if (this.track?.tns?.length > 0) t = this.track.tns[0];
-      else t = this.track.alia[0];
-      return t;
+    subTitle() {
+      let tn = undefined;
+      if (
+        this.track?.tns?.length > 0 &&
+        this.track.name !== this.track.tns[0]
+      ) {
+        tn = this.track.tns[0];
+      }
+
+      //优先显示alia
+      if (this.$store.state.settings.subTitleDefault) {
+        return this.track?.alia?.length > 0 ? this.track.alia[0] : tn;
+      } else {
+        return tn === undefined ? this.track.alia[0] : tn;
+      }
     },
     type() {
       return this.$parent.type;
@@ -136,8 +150,12 @@ export default {
     isAlbum() {
       return this.type === 'album';
     },
-    isTranslate() {
-      return this.track?.tns?.length > 0 || this.track.alia?.length > 0;
+    isSubTitle() {
+      return (
+        (this.track?.tns?.length > 0 &&
+          this.track.name !== this.track.tns[0]) ||
+        this.track.alia?.length > 0
+      );
     },
     isPlaylist() {
       return this.type === 'playlist';
@@ -294,7 +312,7 @@ button {
         font-size: 14px;
         opacity: 0.72;
       }
-      .translate {
+      .sub-title {
         color: #aeaeae;
         margin-left: 4px;
       }
@@ -398,7 +416,7 @@ button {
   .title,
   .album,
   .time,
-  .title-and-artist .translate {
+  .title-and-artist .sub-title {
     color: var(--color-primary);
   }
   .title .featured,
